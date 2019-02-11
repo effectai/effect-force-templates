@@ -16,6 +16,5 @@ To load an example task, paste these coordinaties in the placeholder field, and 
 ## How to use
 ...
 
-
 ## Screen
 ![Map Polygon Annotation Screenshot](screen.png)
