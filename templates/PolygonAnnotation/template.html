@@ -1,0 +1,550 @@
+<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
+
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<!-- Add this after vue.js -->
+<script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+<!-- include OpenLayers -->
+<script src="https://unpkg.com/openlayers/dist/ol.js"></script>
+<!-- include UMD VueLayers build -->
+<link rel="stylesheet" href="https://unpkg.com/vuelayers/lib/style.css">
+<script src="https://unpkg.com/vuelayers/lib/index.umd.js"></script>
+
+<div id="app">
+  <div>
+        <div class="col-12 text-center map-view">
+
+          <div v-if="loaded">
+
+            <!--map view-->
+            <vl-map class="map-view"
+                    :load-tiles-while-animating="true"
+                    :load-tiles-while-interacting="true"
+                    :data-projection="dataProjection">
+              <vl-view
+                :zoom.sync="zoom"
+                :rotation.sync="rotation"
+                :center.sync="center"
+                :extent.sync="extent"
+                :min-zoom.sync="minZoom"
+                :max-zoom.sync="maxZoom"
+              ></vl-view>
+
+              <!--rectangle-->
+              <vl-feature id="region-of-interest">
+                <vl-geom-polygon
+                  :coordinates="[
+                  [corner1, corner2],
+                  [corner2, corner4],
+                  [corner3, corner4],
+                  [corner1, corner3]
+                  ]"></vl-geom-polygon>
+              </vl-feature>
+
+              <!--uncomment for debugging-->
+              <!--<vl-overlay id="overlay-1" :position="corner1">1</vl-overlay>-->
+              <!--<vl-overlay id="overlay-2" :position="corner2">2</vl-overlay>-->
+              <!--<vl-overlay id="overlay-3" :position="corner3">3</vl-overlay>-->
+              <!--<vl-overlay id="overlay-4" :position="corner4">4</vl-overlay>-->
+
+              <!--base layer-->
+              <vl-layer-tile id="map-layer" v-if="showMap">
+                <div v-if="options.baseUrl">
+                  <vl-source-xyz :url="options.baseUrl" :attributions="attributions"></vl-source-xyz>
+                </div>
+                <div v-if="!options.baseUrl">
+                  <vl-source-osm :attributions="attributions"></vl-source-osm>
+                </div>
+              </vl-layer-tile>
+              <vl-layer-image id="image-layer" v-if="showImage">
+                <vl-source-image-static
+                  :url="imgUrl"
+                  :size="imgSize"
+                  :extent="extent"
+                  :projection="dataProjection"
+                ></vl-source-image-static>
+              </vl-layer-image>
+
+              <div v-if="showPolygonAnnotation">
+
+                <!-- draw components -->
+                <vl-layer-vector id="draw-panel">
+                  <vl-source-vector :ident="drawCanvas" :features.sync="drawnFeatures"></vl-source-vector>
+                </vl-layer-vector>
+
+                <vl-interaction-draw v-if="drawType" :source="drawCanvas" :type="drawType"></vl-interaction-draw>
+                <vl-interaction-snap :source="drawCanvas" :priority="10"></vl-interaction-snap>
+                <vl-interaction-modify :source="drawCanvas"></vl-interaction-modify>
+
+                <!--labels-->
+                <vl-feature
+                  v-if="labeledFeatures.length"
+                  v-for="feature in labeledFeatures"
+                  :key="feature.id"
+                  :id="feature.id"
+                  :properties="feature.properties">
+                  <!-- eslint-disable-next-line vue/require-component-is -->
+                  <component is="vl-geom-polygon" v-bind="feature.geometry" />
+                </vl-feature>
+
+              </div>
+
+            </vl-map>
+
+            <!--button panel-->
+            <div class="map-panel" v-if="showPolygonAnnotation && labeledFeatures.length">
+              <b-dropdown id="ddown1" text="Annotations" variant="primary">
+                <b-dropdown-item v-for="feature in labeledFeatures" @click="selectFeatureWithId(feature.id)" :key="feature.id">
+                  {{ Object.values( feature.properties )[0] }}
+                </b-dropdown-item>
+              </b-dropdown>
+            </div>
+
+            <!-- selected feature popup -->
+            <div v-if="selectedFeature" class="popup-panel" :id="selectedFeature.id">
+              <section class="card">
+                <div class="card-content">
+                  <header class="card-header">
+                    <h5 class="card-header-title">
+                      Please answer the following
+                    </h5>
+                  </header>
+
+                  <div class="popup-content">
+                    <div v-for="(annotation, index) in options.annotation" :key="index">
+
+                      <!--question-->
+                      <p class="card-header-content">
+                        {{index + 1}}. {{annotation.question}}
+                      </p>
+
+                      <!--text field-->
+                      <div class="content" v-if="annotation.textfield">
+                        <input id="labelInput"
+                               :class="selectedFeature.id"
+                               v-model="annotationPlaceHolders[index]"
+                               autofocus>
+                      </div>
+
+                      <!--radio drop down-->
+                      <div v-if="annotation.singleChoice">
+                        <b-dropdown id="ddown1" :text="nonSelected"  variant="primary">
+                          <b-dropdown-item v-for="value in annotation.singleChoice" :key="value"
+                                           @click="annotationPlaceHolders.splice(index, 1, value)">
+                            {{ value }}
+                          </b-dropdown-item>
+                        </b-dropdown>
+
+                        <!--show selections-->
+                        {{ annotationPlaceHolders[index] }}
+                      </div>
+
+                      <!--multiple choice down-->
+                      <div v-if="annotation.multiChoice">
+                        <b-dropdown id="ddown1" :text="nonSelected" variant="primary">
+                          <b-dropdown-item v-for="value in annotation.multiChoice" :key="value"
+                                           @click="updateMultiSelectValueAtIndex(value, index)">
+                            {{ value }}
+                          </b-dropdown-item>
+                        </b-dropdown>
+
+                        <!--show selections-->
+                        <div v-if="Array.isArray(annotationPlaceHolders[index]) && annotationPlaceHolders[index].length"
+                             v-for="value in  annotationPlaceHolders[index]" :key="value">
+                          <p>
+                            - {{ value }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <!--separator-->
+                      <hr/>
+
+                    </div>
+                  </div>
+
+                  <!--buttons-->
+                  <footer>
+                    <button class="btn btn-grey" @click="saveDataAndClear">Remove</button>
+                    <button class="btn btn-primary" @click="setLabel" :disabled="isFinishDisabled()">Finish</button>
+                  </footer>
+
+                </div>
+              </section>
+            </div>
+
+          </div>
+
+          <!--loading screen-->
+          <div v-if="!loaded">
+            Loading...
+          </div>
+  	      <div id="input-textarea">
+  	        <textarea
+              name="polygonData"
+  	          :value="polygonData"
+              style="height: 0;opacity: 0;"
+  	        ></textarea>
+  	      </div>
+        </div>
+
+      <div>
+        <!--uncomment for debugging-->
+        <!--OPTIONS:    {{ options }}                <br><br>-->
+        <!--PLACEHOLDER:{{ annotationPlaceHolders }} <br><br>-->
+        <!--DRAWN:      {{ drawnFeatures }}          <br><br>-->
+        <!--SELECTED:   {{ selectedFeature }}        <br><br>-->
+        <!--LABELED:    {{ labeledFeatures }}        <br><br>-->
+        <!--ANNOTATIONS {{ options.annotation }}     <br><br>-->
+      </div>
+                <div v-html="google"></div>
+
+    </div>
+</div>
+
+<script type="module" >
+Vue.use(window.VueLayers)
+
+
+new Vue({
+  el: '#app',
+  data () {
+  	this.options = {
+    "baseUrl": "http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}",
+    "canDrag": false,
+    "canZoom": false,
+    "openExternalGoogle": true,
+    "annotation": [
+        {
+            "question": "How many POI's are within this building?",
+            "textfield": true
+        }
+    ]
+}
+  	this.showPolygonAnnotation = true
+    return {
+      polygonData: '',
+      loaded: false,
+      showMap: false,
+      showImage: false,
+      zoom: 0,
+      minZoom: 0,
+      maxZoom: 28,
+      center: [0, 0],
+      rotation: 0,
+      extent: null,
+      dataProjection: 'EPSG:4326',
+      corner1: [0, 0],
+      corner2: [0, 0],
+      corner3: [0, 0],
+      corner4: [0, 0],
+      drawnFeatures: [],
+      selectedFeature: null,
+      labeledFeatures: [],
+      clickCoordinate: undefined,
+      drawCanvas: 'draw-canvas',
+      labelCanvas: 'label-canvas',
+      nonSelected: 'Select',
+      attributions: '',
+      empty: '',
+      drawType: undefined,
+      assignLabelToPolygon: false,
+      annotationPlaceHolders: [],
+      imgUrl: '',
+      imgSize: [0, 0],
+      google: ''
+
+    }
+  },
+  mounted () {
+    this.setMapData()
+    // get window size for zooming
+    this.$nextTick(function () {
+      window.addEventListener('resize', this.adjustZoomToScreen)
+      this.adjustZoomToScreen()
+    })
+  },
+  watch: {
+    drawnFeatures: function () {
+      this.finishDraw()
+    }
+  },
+  methods: {
+    setMapData () {
+      // retrieve coordinates
+      // const cords = JSON.parse('${cords|raw}')
+      const cords = JSON.parse('[{"lat": "1,34961767", "lon": "103,8520077"}, {"lat": "1,34961767", "lon": "103,8532217"}, {"lat": "1,350411538", "lon": "103,8520077"}, {"lat": "1,350411538", "lon": "103,8532217"}]')
+
+      // parse coordinates to corners
+      this.corner1 = this.parseCoordinates(cords[0])
+      this.corner2 = this.parseCoordinates(cords[1])
+      this.corner3 = this.parseCoordinates(cords[2])
+      this.corner4 = this.parseCoordinates(cords[3])
+
+      // get extent 4326
+      const extent4326 = this.getExtent4326([this.corner1, this.corner2, this.corner3, this.corner4])
+
+      // get center
+      this.center = this.getCenter(extent4326)
+
+      // get extent 3857
+      if (!this.options.canDrag) { this.extent = ol.proj.transformExtent(extent4326, 'EPSG:4326', 'EPSG:3857') }
+
+
+      // open external google maps
+      if (this.options.openExternalGoogle) {
+        this.attributions = `Open in <a href="https://maps.google.com/?q=${this.center[1]},${this.center[0]}&ll=${this.center[1]},${this.center[0]}&z=18" target="_blank">Google</a>`
+        this.google = `<div style='text-align:center'><br><a href="https://maps.google.com/?q=${this.center[1]},${this.center[0]}&ll=${this.center[1]},${this.center[0]}&z=18" target="_blank" class="btn btn-primary">Open in Google Maps</a></div>`
+      }
+
+      // check if we need polygon drawing
+      if (this.showPolygonAnnotation) {
+        this.enablePolygonAnnotation()
+      }
+
+      // start rendering
+      this.showMap = true
+      this.adjustZoomToScreen()
+      this.loaded = true
+
+    },
+    setImageData (imgUrl) {
+      const img = new Image()
+      const vm = this
+      img.onload = function () {
+        const imgSize = [this.width, this.height]
+        const extent = [0, 0, ...imgSize]
+        // create custom projection for image
+        const customProj = createProj({
+          units: 'pixels',
+          extent: extent
+        })
+
+        // add it to the list of known projections
+        addProj(customProj)
+
+        // set data
+        vm.extent = extent
+        vm.zoom = 2
+        vm.center = [imgSize[0] / 2, imgSize[1] / 2]
+        vm.dataProjection = customProj.getCode()
+        vm.imgUrl = imgUrl
+        vm.imgSize = imgSize
+
+        // check if we need polygon drawing
+        if (vm.showPolygonAnnotation) {
+          vm.enablePolygonAnnotation()
+        }
+
+        // start rendering
+        vm.showImage = true
+        vm.adjustZoomToScreen()
+        vm.loaded = true
+      }
+      img.src = imgUrl
+    },
+    enablePolygonAnnotation () {
+      // set draw type to polygon if set
+      this.drawType = 'polygon'
+
+      // prepare answer list
+      for (let i = 0; i < this.options.annotation.length; i++) {
+        this.annotationPlaceHolders.push('')
+      }
+    },
+    adjustZoomToScreen () {
+      const width = document.documentElement.clientWidth
+
+      // determine zoom
+      let zoom = 15
+      if (this.showMap) {
+        zoom = width > 768 ? 18.25 : width > 540 ? 18 : 17
+      } else if (this.showImage) {
+        const imgWidth = this.imgSize[0]
+        zoom = imgWidth > 4000 ? 14 : imgWidth > 3000 ? 15 : imgWidth > 2000 ? 16 : 17
+      }
+
+      // set zoom
+      this.zoom = zoom
+
+      // check for zoom option
+      if (!this.options.canZoom && !this.showImage) {
+        this.minZoom = zoom
+        this.maxZoom = zoom
+      } else {
+        this.minZoom = 0
+        this.maxZoom = 28
+      }
+    },
+    parseFloat (string) {
+      // replace a comma with a dot before parsing
+      return parseFloat(string.replace(/,/, '.'))
+    },
+    parseCoordinates (cord) {
+      return [this.parseFloat(cord['lon']), this.parseFloat(cord['lat'])]
+    },
+    getExtent4326 (array) {
+      let minLat = Infinity
+      let maxLat = -Infinity
+      let minLon = Infinity
+      let maxLon = -Infinity
+      for (let i = 0; i < array.length; i++) {
+        const cord = array[i]
+        const lon = cord[0]
+        const lat = cord[1]
+        if (lon < minLon) minLon = lon
+        if (lon > maxLon) maxLon = lon
+        if (lat < minLat) minLat = lat
+        if (lat > maxLat) maxLat = lat
+      }
+      return [maxLon, maxLat, minLon, minLat]
+    },
+    getCenter (extent) {
+      return [(extent[0] + extent[2]) / 2, (extent[1] + extent[3]) / 2]
+    },
+    setLabel () {
+      let feature = null
+      for (let i = 0; i < this.drawnFeatures.length; i++) {
+        if (this.drawnFeatures[i].id === this.selectedFeature.id) {
+          feature = this.drawnFeatures[i]
+        }
+      }
+      let properties = {}
+      for (let i = 0; i < this.options.annotation.length; i++) {
+        let annotation = this.options.annotation[i]
+        properties[(i + 1) + '. ' + annotation.question] = this.annotationPlaceHolders[i]
+      }
+      this.drawnFeatures = []
+      this.labeledFeatures.push({
+        id: feature.id,
+        type: feature.type,
+        geometry: feature.geometry,
+        properties: properties
+      })
+
+      this.saveDataAndClear()
+    },
+    emitPolygonData () {
+      // determine if there is data
+      let dataAsString = this.labeledFeatures.length
+        ? JSON.stringify({'type': 'FeatureCollection', 'features': this.labeledFeatures}) : ''
+
+      this.polygonData = dataAsString
+    },
+    isFinishDisabled () {
+      for (let i = 0; i < this.annotationPlaceHolders.length; i++) {
+        if (this.annotationPlaceHolders[i].length === 0) {
+          return true
+        }
+      }
+      return false
+    },
+    pointOnSurface (geom) {
+      return findPointOnSurface(geom)
+    },
+    saveDataAndClear () {
+      // set empty
+      this.drawnFeatures = []
+      this.selectedFeature = null
+      for (let i = 0; i < this.annotationPlaceHolders.length; i++) { this.annotationPlaceHolders[i] = '' }
+
+      // save data
+      this.emitPolygonData()
+
+      // enable drawing
+      this.drawType = 'polygon'
+    },
+    finishDraw () {
+      if (!this.drawnFeatures.length) return
+
+      // select latest feature
+      this.selectedFeature = this.drawnFeatures[this.drawnFeatures.length - 1]
+
+      // disable drawing
+      this.drawType = ''
+    },
+    updateMultiSelectValueAtIndex (value, index) {
+      // extract current placeholder
+      let currentAnswers = this.annotationPlaceHolders[index]
+
+      // create array if non existent
+      if (!Array.isArray(currentAnswers)) {
+        this.annotationPlaceHolders[index] = []
+        currentAnswers = this.annotationPlaceHolders[index]
+      }
+
+      // add item, or remove when already present
+      if (currentAnswers.indexOf(value) === -1) {
+        currentAnswers.push(value)
+      } else {
+        currentAnswers.splice(currentAnswers.indexOf(value), 1)
+      }
+
+      // update placeholder
+      this.annotationPlaceHolders.splice(index, 1, currentAnswers)
+    },
+    selectFeatureWithId (featureId) {
+      // loop all features
+      for (let i = 0; i < this.labeledFeatures.length; i++) {
+        // check for feature of interest
+        if (this.labeledFeatures[i].id === featureId) {
+          // update interface data
+          let feature = this.labeledFeatures[i]
+          this.labeledFeatures.splice(i, 1)
+          this.selectedFeature = feature
+          this.drawnFeatures = [feature]
+          this.annotationPlaceHolders = []
+          let self = this
+          Object.values(feature.properties).forEach(function (value) { self.annotationPlaceHolders.push(value) })
+
+          // stop drawing and looping through features
+          this.drawType = ''
+          break
+        }
+      }
+    }
+  }
+});
+
+</script>
+<style>
+
+  .map-view {
+    overflow: hidden;
+    margin: 0 0 0 0;
+    height: 500px;
+    padding:0;
+  }
+
+  .map-panel {
+    position: absolute;
+    top: 10px;
+    left: 55px;
+  }
+
+  .popup-panel {
+    position: absolute;
+    top: 50px;
+    left: 55px;
+  }
+
+  .popup-content {
+    overflow: auto;
+    height: 300px;
+    width: 300px;
+    text-align: left;
+    padding: 10px;
+  }
+
+  header {
+    background: linear-gradient(0deg, $white 0%, $lightestgrey 80%);;
+    border-bottom: 1px solid $lightgrey;
+  }
+
+  footer {
+    padding: 10px 5px;
+    border-top: 1px solid $lightgrey;
+    background: linear-gradient(180deg, $white 0%, $lightestgrey 100%);
+  }
+</style>
