@@ -14,7 +14,7 @@ Please note we have a code of conduct, please follow it in all your interactions
 6. You may merge the Pull Request in once you have the sign-off of two other developers, or if you do not have permission to do that, you may request the second reviewer to merge it for you.
 
 ### Example
-Take a look at the [PolygonAnnotation](./templates/PolygonAnnotation/README.md) tool, for an example of a good template.
+Take a look at the [PolygonAnnotation](./templates/PolygonAnnotation/) tool, for an example of a good template.
 
 ## Code of Conduct
 
