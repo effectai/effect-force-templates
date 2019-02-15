@@ -6,10 +6,14 @@ Please note we have a code of conduct, please follow it in all your interactions
 
 ## Pull Request Process
 
-1. Create your unique clear named template directory inside the `/templates` directory of this repository.
-2. Ensure the `template.html` is working as expected in latest preview engine.
+1. Create your unique clear named template directory inside the `/templates/YOUR_TEMPLATE` directory of this repository.
+2. Ensure the `template.html` is working as expected in the latest preview engine.
 3. Update the README.md in the template directory with details of changes to the interface, this includes placeholders, type options, and result output.
-4. You may merge the Pull Request in once you have the sign-off of two other developers, or if you do not have permission to do that, you may request the second reviewer to merge it for you.
+4. Add the template to index of the main README.md
+5. You may merge the Pull Request in once you have the sign-off of two other developers, or if you do not have permission to do that, you may request the second reviewer to merge it for you.
+
+### Example
+Take a look at the [PolygonAnnotation](./templates/PolygonAnnotation/README.md) tool, for an example of a good template.
 
 ## Code of Conduct
 
