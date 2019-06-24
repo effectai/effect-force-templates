@@ -8,8 +8,9 @@ Repository for task templates to use on the Effect Force micro tasking platform.
 
 ## Templates Content
 
-1. [PolygonAnnotation](./templates/PolygonAnnotation/)
-1. [ImageViewer](./templates/ImageViewer/)
+1. [Polygon Annotation](./templates/PolygonAnnotation/)
+2. [Tweet Sentiment Analysis](./templates/TweetSentiment/)
+3. [Image Viewer](./templates/ImageViewer/)
 
 ## Default Templates
 
