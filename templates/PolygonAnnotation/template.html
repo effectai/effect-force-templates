@@ -131,8 +131,8 @@ window.options = {
                             </div>
                             <!--buttons-->
                             <footer>
-                                <button class="btn btn-grey" @click="saveDataAndClear">Remove</button>
-                                <button class="btn btn-primary" @click="setLabel" :disabled="isFinishDisabled()">Finish</button>
+                                <button class="btn btn-grey" @click.prevent="saveDataAndClear">Remove</button>
+                                <button class="btn btn-primary" @click.prevent="setLabel" :disabled="isFinishDisabled()">Finish</button>
                             </footer>
                         </div>
                     </section>
