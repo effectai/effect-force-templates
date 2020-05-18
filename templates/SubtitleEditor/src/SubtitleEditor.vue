@@ -1,59 +1,59 @@
 <template>
-  <div class="subtitle-editor">
-    <div style="align-items: flex-start; display:flex;">
-         <div class="subtitle-container">
-           <div v-for="(sub, index) in subs" :key="sub.id">
-             <div style="display:flex; justify-content: center; align-items: center" class="subtitle" :class="{'active': index == activeSubIndex, 'focus': index == focusSubIndex}">
-               <div style="margin-right:10px; width: 60px;">
-                 <div><b class="seconds-link" @click="jumpToSeconds(sub.startTime)">{{sub.startTime}}s</b></div>
-                 <div><b class="seconds-link" @click="jumpToSeconds(sub.endTime)">{{sub.endTime}}s</b></div>
-                 <div style="margin: 5px; width: 50px;">&nbsp;<span v-show="index == focusSubIndex || index == activeSubIndex">original:</span></div>
-               </div>
-               <div style="width: 500px; max-width: 100%; min-height: 60px;" :class="{'sub-warning': sub.error == 1, 'sub-error': sub.error == 2}">
-                 <div v-if="sub.hide && false" @click="activateSub(sub.startTime, index)" class="fake-textarea">{{sub.text}}</div>
-                 <textarea v-else :ref="'sub-'+sub.id" :value="sub.text" @input="updateSubText(sub, $event)"  @blur="focusSubIndex = null;getSrt()" @focus="activateSub(sub.startTime, index)" style="height: 43px;"></textarea>
-                 <div v-if="index == focusSubIndex || index == activeSubIndex">{{sub.originalText}}</div>
-               </div>
-             </div>
-           </div>
-         </div>
-         <div id="player-container" class="player-container">
-           <video ref="player" id="player" playsinline controls>
-             <source :src="videoUrl" type="video/mp4" />
-           </video>
-           <div class="subtitle-video">
-             <b v-if="activeSubIndex !== null && activeSubIndex >= 0 && subs[activeSubIndex]">
-               <pre>{{subs[activeSubIndex].text}}</pre>
-             </b>
-           </div>
-           <div id="timeline">
-             <div v-if="duration" ref="timeline" :style="{transform: 'translateX(' + (50+currentTime*-50) + 'px)', minWidth: (duration * 50) + 'px'}" style="border-bottom: 1px solid grey; transform: translateX(50px);">
-               <draggable-subtitle v-bind:key="index" v-for="(sub, index) in subs" @dragging="(x, y) => subTiming(index, x)" @resizing="(x, y, width, height) => subTiming(index, x, width)" :handles="(!ids || ids.length == 0) ? ['ml','mr'] : (index == 0) ? ['mr'] : (index == ids.length - 1) ? ['ml'] : ['ml', 'mr']" :id="sub.id" @activated="scrollToSub(sub.id)" @resizestop="getSrt" @dragstop="getSrt" :ref="'subt-'+sub.id" :draggable="!ids || ids.length == 0 || (index != 0 && index != ids.length - 1)" :parent="true" axis="x" class-name="timeline-sub" :class="{'playing': index == activeSubIndex}" :min-width="50" :x="sub.x" :h="50" :w="sub.w">
-                 <div class="sub-text">{{ sub.text }}</div>
-               </draggable-subtitle>
-               <div class="time">
-                 <div v-for="n in timings" v-bind:key="n" :style="{left: (n) * 50 + 'px'}"><span>{{ n | minutes }}</span></div>
-               </div>
-             </div>
-             <div id="timeline-progress" style="left: 50px"></div>
-           </div>
-         </div>
-         <textarea style="visibility:hidden;position:absolute;width:0" name="subtitles" v-model="srt"></textarea>
-       </div>
-       <div class="comments" v-if="comments">
-         <b>Validator Comment</b>
-         <div style="
-                     background: #ffffbe;
-                     font-size: 18px;
-                     margin: 0 30px;
-                     border-radius: 10px;
-                     padding: 5px 15px;
-                     ">{{comments}}</div>
-       </div>
-       <div style="text-align:center">
-         <button class="btn btn-primary btn-outlined btn-control rewind" @click="shiftSeconds(-10)">&#x3C; Rewind (-10s)</button>
-    <button class="btn btn-primary btn-outlined btn-control play" @click="player.togglePlay()">Play / Pause</button>
-    <button class="btn btn-primary btn-outlined btn-control forward" @click="shiftSeconds(10)">&#x3E; Forward (+10s)</button>
+<div class="subtitle-editor">
+  <div style="align-items: flex-start; display:flex;">
+    <div class="subtitle-container">
+      <div v-for="(sub, index) in subs" :key="sub.id">
+        <div style="display:flex; justify-content: center; align-items: center" class="subtitle" :class="{'active': index == activeSubIndex, 'focus': index == focusSubIndex}">
+          <div style="margin-right:10px; width: 60px;">
+            <div><b class="seconds-link" @click="jumpToSeconds(sub.startTime)">{{sub.startTime}}s</b></div>
+            <div><b class="seconds-link" @click="jumpToSeconds(sub.endTime)">{{sub.endTime}}s</b></div>
+            <div style="margin: 5px; width: 50px;">&nbsp;<span v-show="index == focusSubIndex || index == activeSubIndex">original:</span></div>
+          </div>
+          <div style="width: 500px; max-width: 100%; min-height: 60px;" :class="{'sub-warning': sub.error == 1, 'sub-error': sub.error == 2}">
+            <div v-if="sub.hide && false" @click="activateSub(sub.startTime, index)" class="fake-textarea">{{sub.text}}</div>
+            <textarea v-else :ref="'sub-'+sub.id" :value="sub.text" @input="updateSubText(sub, $event)"  @blur="focusSubIndex = null;getSrt()" @focus="activateSub(sub.startTime, index)" style="height: 43px;"></textarea>
+            <div v-if="index == focusSubIndex || index == activeSubIndex">{{sub.originalText}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="player-container" class="player-container">
+      <video ref="player" id="player" playsinline controls>
+        <source :src="videoUrl" type="video/mp4" />
+      </video>
+      <div class="subtitle-video">
+        <b v-if="activeSubIndex !== null && activeSubIndex >= 0 && subs[activeSubIndex]">
+          <pre>{{subs[activeSubIndex].text}}</pre>
+        </b>
+      </div>
+      <div id="timeline">
+        <div v-if="duration" ref="timeline" :style="{transform: 'translateX(' + (50+currentTime*-50) + 'px)', minWidth: (duration * 50) + 'px'}" style="border-bottom: 1px solid grey; transform: translateX(50px);">
+          <draggable-subtitle v-bind:key="index" v-for="(sub, index) in subs" @dragging="(x, y) => subTiming(index, x)" @resizing="(x, y, width, height) => subTiming(index, x, width)" :handles="(!ids || ids.length == 0) ? ['ml','mr'] : (index == 0) ? ['mr'] : (index == ids.length - 1) ? ['ml'] : ['ml', 'mr']" :id="sub.id" @activated="scrollToSub(sub.id)" @resizestop="getSrt" @dragstop="getSrt" :ref="'subt-'+sub.id" :draggable="!ids || ids.length == 0 || (index != 0 && index != ids.length - 1)" :parent="true" axis="x" class-name="timeline-sub" :class="{'playing': index == activeSubIndex}" :min-width="50" :x="sub.x" :h="50" :w="sub.w">
+            <div class="sub-text">{{ sub.text }}</div>
+          </draggable-subtitle>
+          <div class="time">
+            <div v-for="n in timings" v-bind:key="n" :style="{left: (n) * 50 + 'px'}"><span>{{ n | minutes }}</span></div>
+          </div>
+        </div>
+        <div id="timeline-progress" style="left: 50px"></div>
+      </div>
+    </div>
+    <textarea style="visibility:hidden;position:absolute;width:0" name="subtitles" v-model="srt"></textarea>
+  </div>
+  <div class="comments" v-if="comments">
+    <b>Validator Comment</b>
+    <div style="
+                background: #ffffbe;
+                font-size: 18px;
+                margin: 0 30px;
+                border-radius: 10px;
+                padding: 5px 15px;
+                ">{{comments}}</div>
+  </div>
+  <div style="text-align:center">
+    <a class="btn btn-primary btn-outlined btn-control rewind" @click="shiftSeconds(-10)">&#x3C; Rewind (-10s)</a>
+    <a class="btn btn-primary btn-outlined btn-control play" @click="player.togglePlay()">Play / Pause</a>
+    <a class="btn btn-primary btn-outlined btn-control forward" @click="shiftSeconds(10)">&#x3E; Forward (+10s)</a>
   </div>
 </div>
 </template>
