@@ -618,6 +618,8 @@ export default {
     z-index: 10;
 }
 
+#player { height: auto; }
+
 .youtube-overlay .plyr__control,
 .youtube-overlay .plyr__controls,
 .youtube-overlay .plyr__poster {
