@@ -383,10 +383,10 @@ export default {
                 let lines = sub.text.split("\n");
                 let error = 0;
                 for(let line of lines) {
-                  if (line.length > 40 || lines.length > 2) {
+                  if (line.length > 50 || lines.length > 2) {
                     error = 2;
                     break;
-                  } else if(line.length > 30) {
+                  } else if(line.length > 40) {
                     error = 1;
                   }
                 }
@@ -407,7 +407,7 @@ export default {
               this.getSrt();
               
               this.player = new Plyr(this.$refs.player, {
-                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings'],
+                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'fullscreen'],
                 keyboard: {
                   global: true,
                   focused: false,
@@ -415,7 +415,7 @@ export default {
                 invertTime: false,
                 hideControls: false,
                 fullscreen: {
-                  enabled: false,
+                  enabled: true,
                   fallback: false,
                   iosNative: false
                 }
@@ -630,11 +630,13 @@ export default {
     max-width: 570px;
     width: 100%;
     position: relative;
+    max-height:480px;
 }
 
 .plyr {
     margin: 0 auto;
     max-width: 570px;
+    max-height: 350px;
 }
 
 .subtitle-container {
@@ -754,12 +756,12 @@ export default {
 }
 
 .sub-warning textarea, .sub-warning .fake-textarea {
-    border-color: orange;
-    background: #ffc8a2;
+    border-color: orange !important;
+    background: #ffc8a2  !important;
 }
 .sub-error textarea, .sub-error .fake-textarea {
-    border-color: red;
-    background: #ff9f9f;
+    border-color: red  !important;
+    background: #ff9f9f  !important;
 }
 
 #timeline-progress {

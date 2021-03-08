@@ -1,7 +1,8 @@
+<link rel="stylesheet" type="text/css" href="https://worker.effect.ai/static/css/template.css">
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet"> 
 <script src="dist/SubtitleEditor.umd.min.js"></script>
-<link href="https://files.effect.ai/tmp/SubtitleEditor.css" rel="stylesheet"> 
+<link href="dist/SubtitleEditor.css" rel="stylesheet"> 
 <link rel="stylesheet" href="https://cdn.plyr.io/3.6.2/plyr.css" />
 
 <script>
@@ -10,15 +11,15 @@
         window.validateMode = true;
     }
 </script>
-
-<div id='task'>
-    <subtitle-editor 
-      srt-url="https://files.effect.ai/translate/media/ama.srt" 
-      video-url="https://files.effect.ai/translate/media/ama.mp4"
-      :ids="[10]">
-    </subtitle-editor>
-</div>
-
+<form id="FORCE_FORM">
+  <div id='task'>
+      <subtitle-editor 
+        srt-url="https://files.effect.ai/translate/media/ama.srt" 
+        video-url="https://files.effect.ai/translate/media/ama.mp4"
+        :ids="[10]">
+      </subtitle-editor>
+  </div>
+</form>
 <script>
   window.vm1 = new Vue({
     el: '#task',
