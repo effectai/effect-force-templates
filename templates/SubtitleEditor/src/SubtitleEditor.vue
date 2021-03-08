@@ -4,7 +4,7 @@
     <div class="subtitle-container">
       <div v-for="(sub, index) in subs" :key="sub.id">
         <div style="display:flex; justify-content: center; align-items: center" class="subtitle" :class="{'active': index == activeSubIndex, 'focus': index == focusSubIndex}">
-          <div style="margin-right:10px; width: 60px;">
+          <div class="gutter-left" style="margin-right:10px; width: 60px;">
             <div><b class="seconds-link" @click="jumpToSeconds(sub.startTime)">{{sub.startTime}}s</b></div>
             <div><b class="seconds-link" @click="jumpToSeconds(sub.endTime)">{{sub.endTime}}s</b></div>
             <div style="margin: 5px; width: 50px;">&nbsp;<span v-show="index == focusSubIndex || index == activeSubIndex">original:</span></div>
@@ -416,7 +416,7 @@ export default {
                 hideControls: false,
                 fullscreen: {
                   enabled: true,
-                  fallback: false,
+                  fallback: true,
                   iosNative: false
                 }
               });
