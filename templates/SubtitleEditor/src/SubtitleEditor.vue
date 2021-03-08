@@ -240,10 +240,10 @@ export default {
       let newLines = newText.split("\n");
       let error = 0;
       for (let line of newLines) {
-        if (line.length > 40 || newLines.length > 2) {
+        if (line.length > 50 || newLines.length > 2) {
           error = 2;
           break;
-        } else if(line.length > 30) {
+        } else if(line.length > 40) {
           error = 1;
         }
       }
