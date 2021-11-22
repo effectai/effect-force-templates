@@ -1,19 +1,33 @@
 <div id="app">
   <div>
-    <div v-if="loading" class="loader">loading...</div>
-    <div id="embed" ref="embed"></div>
-    <iframe @load="loading = false;" :src="url" v-if="url"></iframe>
+
+    <blockquote class="twitter-tweet">
+      <p lang="en" dir="ltr">
+        <a href="${tweet_url}"></a>
+      </p>
+      </blockquote> 
   </div>
   <div class="question question-sentiment">
     <h2>What is the <b>sentiment of this post</b>?</h2>
-    <input id="sentiment" type="text" required v-model="sentiment" name="sentiment" />
-    <label class="btn btn-primary" @click="sentiment = 'positive'">Positive</label>
-    <label class="btn btn-primary" @click="sentiment = 'neutral'">Neutral</label>
-    <label class="btn btn-primary" @click="sentiment = 'negative'">Negative</label>
+    <input id="sentiment" type="text" name="sentiment" />
+    <label class="btn btn-primary" value='positive'">Positive</label>
+    <label class="btn btn-primary" value='neutral'">Neutral</label>
+    <label class="btn btn-primary" value='negative'">Negative</label>
   </div>
+
+  <hr>
+  <button type="submit">Submit</button>
 </div>
-<script sync src="https://platform.twitter.com/widgets.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.js"></script>
+
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+
+<script>
+
+// Logic here to retrieve content of the tweet and other relevant properties.
+
+</script>
+
+
 <style>
   #app {
       text-align:center;
@@ -24,10 +38,6 @@
       opacity:0;
       position: absolute;
   }
-  iframe {
-    width: 100%;
-    height: 500px;
-  }
   .question h2 {
     margin: 30px 0;
   }
@@ -35,46 +45,3 @@
     margin-bottom: 10px;
   }
 </style>
-<script>
-  const app = new Vue({
-    el: '#app',
-    watch: {
-      sentiment: function(newValue) {
-        Vue.nextTick(() => {
-          forceSubmit();
-        })              
-      }
-    },
-    mounted () {
-      this.init();
-    },
-    methods: {
-      async init() {
-        const embed = this.$refs.embed;
-        const url = "${tweetlink}";
-
-        if (url.includes("twitter.com")) {
-          const parts = url.split("/");
-          const id = parts[parts.length-1];
-
-          const el = await twttr.widgets.createTweet(id, embed, {});
-          this.loading = false;
-          if (typeof el === "undefined") {
-            // dead link
-          } else {
-            el.style.margin="0 auto";
-          }
-          forceResize();
-                
-        } else {
-      this.url = url
-        }
-      },
-    },
-    data: {
-      sentiment: null,
-      loading: true,
-      url: null
-    }
-  })
-</script>
