@@ -1,6 +1,6 @@
-<p align="center"><img src="effect-force-logo.png" width="400px"></p>
+<p align="center"><img src="https://effect.network/img/logo/logo.png" width="400px"></p>
 
-<p align="center"><img src="effect-logo.png" width="96px"></p>
+<!-- <p align="center"><img src="https://effect.network/img/logo/logo_icon.png" width="96px"></p> -->
 
 <h1 align="center">Effect Force Templates</h1>
 
@@ -8,23 +8,25 @@ Repository for task templates to use on the Effect Force micro tasking platform.
 
 ## Templates Content
 
-1. [Polygon Annotation](./templates/PolygonAnnotation/)
+1. [Image Classifier](./templates/Image_Classifier/)
 2. [Tweet Sentiment Analysis](./templates/TweetSentiment/)
 3. [Image Viewer](./templates/ImageViewer/)
 
 ## Default Templates
 
-Effect Force provides Default Templates that make it easy for Requesters to get started creating tasks for Workers. It is important that the design of the tasks are clear and easy to use, as it enables Workers to efficiently complete the work and provide better quality. The default templates are a great starting point and serve as an example for Requesters that want to design tasks that Workers will love. Each default template is easy-to-use and can be customized to your needs with small modifications to its code. All Default Templates are mobile-ready from the start and have been optimized to be friendly and efficient for workers. Effect Force will provide default templates for surveys, images, video, audio transcription, map annotations, pixel annotations, bounding box annotations, sentiment analysis and more!
+In this repo, you will find some example templates that can be used in order to guide you on building campaigns on Effect Force.
+It is important that the design of the tasks are clear and easy to use, as it enables Workers to efficiently complete the work and provide better quality. These templates are a good starting point and serve as an example for you to be able to design tasks that Workers will enjoy working on.
 
-## Compatible with Amazon Mturk Layouts
+Templates are made up of generic HTML tags. Within which you can add your own content.
+So the templates can range from any kind of content, from simple images to complex video or audio content with transcriptions capabilities. 
+Ideas can range from map annotations, pixel annotations, bounding box annotations, sentiment analysis, image classification surveys, and more!
 
-It’s no secret we want every Requester from Amazon’s mturk platform to join and use the Effect Force platform instead! To accomplish this we need to give those Requesters as many reasons as possible to make the switch. That’s why the Effect Generic Templates are 100% compatible with Amazon MTurk Layouts. This gives Requesters the possibility to seamlessly copy and paste their tasks from Amazon MTurk directly to Effect Force without having to change anything!
 
 ## Parameter Substitution
 
 The Generic Templates also allow Requesters to use placeholders in their templates. These placeholders are replaced with values from a list of tasks where each row contains all the values for the parameters of a task. The column names of the list with tasks must match the parameter names used in the template. Requesters can use this parameter substitution capability to create a large number of tasks that all share a common layout and design (template).
 
-For example: you want to create a tasks that asks Workers to provide keywords for images. You create the template for that task for a single image once and you use a placeholder `${image_url}` for the source of the image:
+For example, you want to create a task that asks Workers to provide keywords for images. You create the template for that task for a single image once, and you use a placeholder `${image_url}` for the source of the image:
 
 ```html
 <p>Provide keywords for the following image:</p>
@@ -42,14 +44,14 @@ This template can be used with a list of placeholders for each task:
 "https://force.effect.ai/image3.png"
 ```
 
-This will result in three tasks that each contain a different picture, but share a common template. A single task will look like this on the Effect Force platform:
+This will result in three tasks that each contain a different picture but share a common template. A single task will look like this on the Effect Force platform:
 
 <p align="center"><img src="example.png"></p>
 
 
 ## Preview Tool
-
-Visit the [preview tool](https://api.beta.effect.ai/template/preview) to modify your template to your likings.
+<!-- TODO -->
+<!-- Visit the [preview tool]() to modify your template to your likings. -->
 
 ## Contributing
 
