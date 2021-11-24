@@ -1,12 +1,8 @@
-<div id="app">
-  <div>
+<div>
 
-    <blockquote class="twitter-tweet">
-      <p lang="en" dir="ltr">
-        <a href="${tweet_url}"></a>
-      </p>
-      </blockquote> 
+  <div id="container">    
   </div>
+
   <div class="question question-sentiment">
     <h2>What is the <b>sentiment of this post</b>?</h2>
     <input id="sentiment" type="text" name="sentiment" />
@@ -14,6 +10,12 @@
     <label class="btn btn-primary" value='neutral'">Neutral</label>
     <label class="btn btn-primary" value='negative'">Negative</label>
   </div>
+
+  <hr>
+  <h2>Retweet and Like this Tweet</h2>
+  <!-- <a href="https://twitter.com/intent/tweet?in_reply_to=${tweet_id}">Reply</a> -->
+  <a href="https://twitter.com/intent/retweet?tweet_id=${tweet_id}">Retweet</a>
+  <a href="https://twitter.com/intent/like?tweet_id=${tweet_id}">Like</a>
 
   <hr>
   <button type="submit">Submit</button>
@@ -24,6 +26,8 @@
 <script>
 
 // Logic here to retrieve content of the tweet and other relevant properties.
+// Tweet is added to div with the id container.
+twttr.widgets.createTweet(${tweet_id}, document.getElementById('container', {theme: 'dark'}))
 
 </script>
 
