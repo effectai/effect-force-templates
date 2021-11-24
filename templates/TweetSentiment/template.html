@@ -1,51 +1,41 @@
-<div>
+<section class="section">
+    <div class="container has-text-centered">
+        <div id="tweet">
+            <h1 class="title">Tweet Sentiment</h1>
+        </div>
 
-  <div id="container">    
-  </div>
+        <div class="question question-sentiment">
+            <h2 class="subtitle">What is the <b>sentiment of this post</b>?</h2>
+            <div class="field">
+                <input class="is-checkradio" id="negative" value="negative" type="radio" name="sentiment">
+                <label for="negative">Negative</label>
+                <input class="is-checkradio" id="neutral" value="neutral" type="radio" name="sentiment">
+                <label for="neutral">Neutral</label>
+                <input class="is-checkradio" id="positive" value="positive" type="radio" name="sentiment">
+                <label for="positive">Positive</label>
+            </div>
+        </div>
 
-  <div class="question question-sentiment">
-    <h2>What is the <b>sentiment of this post</b>?</h2>
-    <input id="sentiment" type="text" name="sentiment" />
-    <label class="btn btn-primary" value='positive'">Positive</label>
-    <label class="btn btn-primary" value='neutral'">Neutral</label>
-    <label class="btn btn-primary" value='negative'">Negative</label>
-  </div>
+        <button type="submit" class="button is-primary is-large mt-6">Submit</button>
+    </div>
+</section>
 
-  <hr>
-  <h2>Retweet and Like this Tweet</h2>
-  <!-- <a href="https://twitter.com/intent/tweet?in_reply_to=${tweet_id}">Reply</a> -->
-  <a href="https://twitter.com/intent/retweet?tweet_id=${tweet_id}">Retweet</a>
-  <a href="https://twitter.com/intent/like?tweet_id=${tweet_id}">Like</a>
-
-  <hr>
-  <button type="submit">Submit</button>
-</div>
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-checkradio@2.1.2/dist/css/bulma-checkradio.min.css">
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
 
 <script>
-
-// Logic here to retrieve content of the tweet and other relevant properties.
+window.addEventListener('load', function() {
+  // Logic here to retrieve content of the tweet and other relevant properties.
 // Tweet is added to div with the id container.
-twttr.widgets.createTweet(${tweet_id}, document.getElementById('container', {theme: 'dark'}))
+twttr.widgets.createTweet('${tweet_id}', document.getElementById('tweet', {theme: 'dark'})).then(() => {forceResize()})
+
+})
 
 </script>
-
-
 <style>
-  #app {
-      text-align:center;
-  }
-  #sentiment {
-      width:0;
-      height:0;
-      opacity:0;
-      position: absolute;
-  }
-  .question h2 {
-    margin: 30px 0;
-  }
-  .btn {
-    margin-bottom: 10px;
-  }
+.twitter-tweet {
+    margin-left: auto;
+    margin-right: auto;
+}
 </style>
