@@ -1,40 +1,69 @@
-<div style='text-align:center; width:50%; justify-content: center;'>
-    <image src='https://gateway.pinata.cloud/ipfs/${ipfs}'></image>
+<div class="section">
+    <div class="container" has-text-centered>
 
-    <h2>Classify the Pepe 🐸</h2>
+        <div class="classify-image">
+            <h1 class="title">Classify The Image</h1>
+            <image src='https://gateway.pinata.cloud/ipfs/${ipfs}'></image>
+        </div>
 
-    <div>
-        <p>Number of eyes 👀</p>
-        <input type="number" name="number of eyes" id="eyes">
-        </br>
+        <hr>
 
-        <p>Number of mouths 🤑</p>
-        <input type="number" name="number of mouths" id="mouth">
-        </br>
+        <!-- Number of eyes -->
+        <div class="block">
+            <h3>Number of eyes?</h3>
+            <input type="number" name="num-eyes" id="num-eyes">
+            <label for="eyes">Eyes</label>
+        </div>
+
+        <hr>
+
+        <!-- Color of the image -->
+        <div class="block">
+            <h3>Color?</h3>
+            <input type="text" name="color" id="color"> 
+            <label for="color">Color</label>
+        </div>
+
+        <hr>
+
+        <!-- Animated -->
+        <div class="block">
+            <h3>Is this image animated?</h3>
+            <input type="checkbox" name="animated" id="animated">
+            <label for="animated">Animated</label>
+        </div>
+
+        <hr>
+
+        <!-- Resemblance -->
+        <div class="question question-sentiment">
+            <h2 class="subtitle">How much does this resemble the original one?</h2>
+            <div class="field">
+                <input class="is-checkradio" id="full" value="full" type="radio" name="resemblance">
+                <label for="full">Completly</label>
+                <input class="is-checkradio" id="half" value="half" type="radio" name="resemblance">
+                <label for="half">Half</label>
+                <input class="is-checkradio" id="none" value="none" type="radio" name="resemblance">
+                <label for="none">Nothing At All</label>
+            </div>
+        </div>
+
+        <button type="submit" class="button is-primary is-large mt-6">Submit</button>
+
     </div>
 
-    </hr>
-
-    <h2>How much this Pepe resemble the original one? 🐸</h2>
-    <input type='radio' name='radio-answer' id="original" label=''>This is totally Pepe 🤩</input><br>
-    <input type='radio' name='radio-answer' id="original" label=''>It kind of looks like Pepe 😏</input><br>
-    <input type='radio' name='radio-answer' id="original" label=''>I guess it reminds me of Pepe 🤐</input> <br>
-    <input type='radio' name='radio-answer' id="original" label=''>The fuck is a Pepe? 😵</input><br>
-    
-    </hr>
-
-    <h2>Is this image animated? 💅</h2>
-    <input type='checkbox' name='checkbox-answer' id="animated" label=''>True/False</input>
-
-    <!-- Have a submit button at the end of the template for the user to interact with to submit their results -->
-    <button type="submit">Submit</button> 
 </div>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-checkradio@2.1.2/dist/css/bulma-checkradio.min.css">
+
+
 <script>
-    // Add your scripts here to make the page dynamic here.
-    setTimeout(() => console.log(window.FORCE_PLACEHOLDERS), 1000)
+//  Logic here
+// Log the placeholder values with window.FORCE_PLACEHOLDERS
+setTimeout(() => console.log(window.FORCE_PLACEHOLDERS), 1000)
 </script>
 
 <style>
-    /* Css styles here. */
+/* Custom styles here. */
 </style>
