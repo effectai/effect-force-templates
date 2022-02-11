@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>File Upload Campaign</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <script src="https://bundle.run/buffer@6.0.3"></script>
+    <script src="https://unpkg.com/ipfs-api@26.1.0/dist/index.js"></script>
+  </head>
+  <script type="text/javascript">
+    function upload() {
+      const reader = new FileReader();
+      reader.onloadend = async function() {
+        const ipfs = window.IpfsApi({ host: 'ipfs.effect.ai', port: 443, protocol: 'https' }) // Connect to IPFS
+        const buf = buffer.Buffer(reader.result) // Convert data into buffer
+
+      ipfs.files.add(buf, (err, result) => { // Upload buffer to IPFS
+          if(err) {
+            console.error(err)
+            return
+          }
+          console.log('result',result)
+          let url = `https://ipfs.effect.ai/ipfs/${result[0].hash}`
+          console.log(`Url -->`, url)
+          document.getElementById("url").innerHTML= url
+          document.getElementById("url").href= url
+          document.getElementById("output").src = url
+          document.getElementById("submit-btn").removeAttribute('disabled')
+        })
+
+      }
+      const photo = document.getElementById("photo");
+      reader.readAsArrayBuffer(photo.files[0]); // Read Provided File
+    }
+  </script>
+  <body>
+    <form action="/">
+      <fieldset>
+
+        <legend>Upload photo</legend>
+        <input type="file" name="photo" id="photo">
+        <button type="button" onclick="upload()">Upload</button>
+
+        <button id="submit-btn" disabled type="submit">Submit</button>
+      </fieldset>
+      <img>
+    </form>
+    </br>
+    </br>
+    <a id="url" target="_blank"></a>
+    </br>
+    </br>
+    <img id="output">
+  </body>
+</html>
