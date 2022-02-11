@@ -24,6 +24,7 @@
           document.getElementById("url").innerHTML= url
           document.getElementById("url").href= url
           document.getElementById("output").src = url
+          document.getElementById("image_url").value = url
           document.getElementById("submit-btn").removeAttribute('disabled')
         })
 
@@ -39,7 +40,7 @@
         <legend>Upload photo</legend>
         <input type="file" name="photo" id="photo">
         <button type="button" onclick="upload()">Upload</button>
-
+        <input type="hidden" name="image_url" id="image_url">
         <button id="submit-btn" disabled type="submit">Submit</button>
       </fieldset>
       <img>
