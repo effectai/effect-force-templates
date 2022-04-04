@@ -1,6 +1,7 @@
 <div class="section">
     <div class="container" has-text-centered>
 
+        <form>
         <div class="classify-image">
             <h1 class="title">Classify The Image</h1>
             <image src='https://gateway.pinata.cloud/ipfs/${ipfs}'></image>
@@ -11,8 +12,7 @@
         <!-- Number of eyes -->
         <div class="block">
             <h3>Number of eyes?</h3>
-            <input type="number" name="num-eyes" id="num-eyes">
-            <label for="eyes">Eyes</label>
+            <input type="number" name="num-eyes" id="num-eyes" required>
         </div>
 
         <hr>
@@ -20,8 +20,7 @@
         <!-- Color of the image -->
         <div class="block">
             <h3>Color?</h3>
-            <input type="text" name="color" id="color"> 
-            <label for="color">Color</label>
+            <input type="text" name="color" id="color" required> 
         </div>
 
         <hr>
@@ -39,7 +38,7 @@
         <div class="question question-sentiment">
             <h2 class="subtitle">How much does this resemble the original one?</h2>
             <div class="field">
-                <input class="is-checkradio" id="full" value="full" type="radio" name="resemblance">
+                <input class="is-checkradio" id="full" value="full" type="radio" name="resemblance" required>
                 <label for="full">Completly</label>
                 <input class="is-checkradio" id="half" value="half" type="radio" name="resemblance">
                 <label for="half">Half</label>
@@ -48,14 +47,15 @@
             </div>
         </div>
 
-        <button type="submit" class="button is-primary is-large mt-6">Submit</button>
-
+        <button type="submit" class="is-large mt-6">Submit</button>
+        </form>
     </div>
 
 </div>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css"> -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-checkradio@2.1.2/dist/css/bulma-checkradio.min.css">
+<link href="https://app.effect.network/force-defaults.css" rel="stylesheet" />
 
 
 <script>

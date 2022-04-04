@@ -5,6 +5,7 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <script src="https://bundle.run/buffer@6.0.3"></script>
     <script src="https://unpkg.com/ipfs-api@26.1.0/dist/index.js"></script>
+    <link href="https://app.effect.network/force-defaults.css" rel="stylesheet" />
   </head>
   <script type="text/javascript">
     function upload() {
@@ -35,14 +36,12 @@
   </script>
   <body>
     <form action="/">
-      <fieldset>
-
-        <legend>Upload photo</legend>
-        <input type="file" name="photo" id="photo">
-        <button type="button" onclick="upload()">Upload</button>
-        <input type="hidden" name="image_url" id="image_url">
-        <button id="submit-btn" disabled type="submit">Submit</button>
-      </fieldset>
+      <input type="file" name="photo" id="photo">
+      <input type="hidden" name="image_url" id="image_url">
+      <br>
+      <button type="button" onclick="upload()">Upload</button>
+      <hr>
+      <button id="submit-btn" disabled type="submit">Submit</button>
       <img>
     </form>
     </br>
