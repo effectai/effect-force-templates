@@ -1,0 +1,133 @@
+
+<div id="app" style="text-align: center;">
+{{ message }}
+<h1 class="title">{{title}}</h1>
+
+<hr>
+
+<!-- Wrap the image or canvas element with a block element (container) -->
+<div class="mx-auto" style="max-width: 80%">
+    <img id="image" ref="image" :src="imageSource" style="display: block; max-width: 100%;">
+</div>
+
+<hr>
+
+<div>
+    <input v-model="tmpLabel" type="text" name="label" id="idx" placeholder="Add label" style="max-width: 400px;">
+    <button class="button is-primary" @click.prevent="addCrop">Add Label</button>
+</div>
+
+<br>
+
+<div class="labels mx-6 mx-auto">
+    <ul>
+    <li v-for="(label, idx) in labels">
+
+        <div class="mx-auto" style="max-width: 600px;">
+        <div class="media mx-auto mx-6 is-centered">
+
+            <div class="media-left">
+            <figure class="image is-64x64">
+                <img class="" :src="label.croppedCanvas">
+            </figure>
+            </div>
+            
+            <div class="media-content">
+            {{ label.label }}
+            </div>
+
+            <div class="media-right">
+            <button class="delete is-medium" @click.prevent="labels.splice(idx, 1)"></button>
+            </div>
+
+        </div>
+        </div>
+    </li>
+    </ul>
+</div>
+
+<hr>
+<button 
+    @click.prevent="uploadAndSubmit" 
+    class="button is-primary is-large"
+    :class="{'is-loading': btnLoading}"
+    :disabled="labels.length < 1"
+>
+    Submit
+</button>
+</div>
+
+<!-- 📚 Load in resources: [Bulma, Effect Network Styling]  -->
+<link rel="stylesheet" href="https://unpkg.com/bulma@0.9.4/css/bulma.min.css">
+<link rel="stylesheet" href="https://unpkg.com/cropperjs@1.5.12/dist/cropper.min.css">
+<link href="https://app.effect.network/force-defaults.css" rel="stylesheet" />
+
+<script src="https://cdn.jsdelivr.net/npm/ipfs-http-client/dist/index.min.js"></script>
+<script type="module">
+  import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+  import Cropper from 'https://unpkg.com/cropperjs@1.5.12/dist/cropper.esm.js'
+
+  createApp({
+    data () {
+      return {
+        title: "Effect Network Image Labeler 🧐",
+        imageSource: "${image_url}",
+        cropper: null,
+        tmpLabel: '',
+        labels: [],
+        btnLoading: false,
+        ipfsClient: null
+      }
+    },
+    computed: {},
+    created () {
+      setInterval(() => window.forceResize(), 500)
+    },
+    mounted () {
+      const imgElement = this.$refs.image
+      this.cropper = new Cropper(imgElement, {
+        crop(event) { 
+          // console.log({...event.detail}) 
+        }
+      })
+      console.log(this.cropper)
+    },
+    methods: {
+      addCrop () {
+        if (this.tmpLabel.length == 0) {
+          alert("Please fill in a label.")
+        } else {            
+          this.labels.push({
+            label: this.tmpLabel, 
+            croppedCanvas: this.cropper.getCroppedCanvas({
+              width: 160,
+              height: 160
+            }).toDataURL('image/jpeg')
+          })
+          this.tmpLabel = ''
+          console.log(this.labels)
+        }
+      },
+      async uploadAndSubmit () {
+        this.btnLoading = true
+        try {
+          // console.log(IpfsApi)
+          const ipfs = window.IpfsHttpClient.create({ host: 'ipfs.effect.ai', port: 443, protocol: 'https' })
+          const hash = await ipfs.add(JSON.stringify(
+              { "data": this.labels, "image_url": `${image_url}` }
+          ))
+
+          console.log(hash)
+
+          parent.postMessage({'task': 'submit', 'values': {
+          "hash": hash.path
+          }}, '*')
+        } catch (error) {
+          console.error('Failed to upload to IPFS', error)
+        }
+        this.btnLoading = false
+      }
+    },
+  })
+  .mount("#app");
+</script>
